@@ -10,7 +10,7 @@ from routers.auth import get_current_user
 router = APIRouter(prefix="/teams", tags=["teams"])
 
 
-@router.get("/", response_model=list[TeamResponse])
+@router.get("", response_model=list[TeamResponse])
 def list_teams(
     current_user: UserResponse = Depends(get_current_user), db: Database = Depends(get_db)
 ):

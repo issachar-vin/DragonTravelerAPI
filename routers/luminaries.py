@@ -55,7 +55,7 @@ def _embed_gear_images(docs: list[dict], db: Database) -> None:
                 item["images"] = piece.get("images", {})
 
 
-@router.get("/")
+@router.get("")
 def list_luminaries(
     db: Database = Depends(get_db),
     class_: str | None = Query(None, alias="class"),

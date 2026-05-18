@@ -11,7 +11,7 @@ from routers import admin, auth, luminaries, teams
 
 IMAGES_DIR = Path(settings.images_dir)
 
-app = FastAPI(title="Dragon Traveler Guide API")
+app = FastAPI(title="Dragon Traveler Guide API", redirect_slashes=False)
 
 app.add_middleware(
     CORSMiddleware,
