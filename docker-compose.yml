@@ -1,0 +1,27 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: dragon_travelers_guide
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      IMAGES_DIR: /app/images
+    volumes:
+      - images_data:/app/images
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
+  images_data:
