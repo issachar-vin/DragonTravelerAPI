@@ -34,7 +34,6 @@ def _serialize_nested(d: dict) -> dict:
 
 
 def _embed_gear_images(docs: list[dict], db: Database) -> None:
-    """Mutates docs in-place, embedding gear image paths into recommended_gear items."""
     piece_ids = list(
         {
             item["gear_piece_id"]
@@ -55,6 +54,26 @@ def _embed_gear_images(docs: list[dict], db: Database) -> None:
                 item["images"] = piece.get("images", {})
 
 
+def _embed_gear_set_bonuses(docs: list[dict], db: Database) -> None:
+    set_names = list(
+        {item["set"] for doc in docs for item in doc.get("recommended_gear", []) if item.get("set")}
+    )
+    if not set_names:
+        return
+    sets_by_name = {
+        s["name"]: s
+        for s in db.gear_sets.find(
+            {"name": {"$in": set_names}}, {"name": 1, "bonus_type": 1, "bonus_effect": 1}
+        )
+    }
+    for doc in docs:
+        for item in doc.get("recommended_gear", []):
+            gs = sets_by_name.get(item.get("set", ""))
+            if gs:
+                item["bonus_type"] = gs.get("bonus_type")
+                item["bonus_effect"] = gs.get("bonus_effect")
+
+
 @router.get("")
 def list_luminaries(
     db: Database = Depends(get_db),
@@ -71,6 +90,7 @@ def list_luminaries(
         query["tiers.overall"] = tier
     docs = list(db.luminaries.find(query))
     _embed_gear_images(docs, db)
+    _embed_gear_set_bonuses(docs, db)
     return [_serialize(doc) for doc in docs]
 
 
@@ -80,4 +100,5 @@ def get_luminary(slug: str, db: Database = Depends(get_db)):
     if not doc:
         raise HTTPException(status_code=404, detail="Luminary not found")
     _embed_gear_images([doc], db)
+    _embed_gear_set_bonuses([doc], db)
     return _serialize(doc)
