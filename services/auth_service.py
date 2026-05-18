@@ -12,6 +12,10 @@ from models.user import UserCreate, UserResponse
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
+def _user_response(doc: dict) -> UserResponse:
+    return UserResponse(id=str(doc["_id"]), email=doc["email"], role=doc.get("role", "user"))
+
+
 def hash_password(password: str) -> str:
     if len(password.encode("utf-8")) > 72:
         raise ValueError("Password must be 72 characters or fewer")
@@ -42,7 +46,7 @@ def register(db: Database, data: UserCreate) -> UserResponse:
         doc = user_repo.create_user(db, data.email, hash_password(data.password))
     except DuplicateKeyError:
         raise ValueError("Email already registered")
-    return UserResponse(id=str(doc["_id"]), email=doc["email"], role=doc.get("role", "user"))
+    return _user_response(doc)
 
 
 def authenticate(db: Database, email: str, password: str) -> str:
@@ -62,4 +66,4 @@ def get_current_user(db: Database, token: str) -> UserResponse:
     doc = user_repo.find_by_id(db, user_id)
     if not doc:
         raise ValueError("User not found")
-    return UserResponse(id=str(doc["_id"]), email=doc["email"], role=doc.get("role", "user"))
+    return _user_response(doc)
