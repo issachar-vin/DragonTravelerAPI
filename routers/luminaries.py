@@ -1,36 +1,10 @@
-from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pymongo.database import Database
 
 from database import get_db
+from utils.serialization import serialize_doc
 
 router = APIRouter(prefix="/luminaries", tags=["luminaries"])
-
-
-def _serialize(doc: dict) -> dict:
-    doc["id"] = str(doc.pop("_id"))
-    for k, v in list(doc.items()):
-        if isinstance(v, ObjectId):
-            doc[k] = str(v)
-        elif isinstance(v, list):
-            doc[k] = [_serialize_value(item) for item in v]
-        elif isinstance(v, dict):
-            doc[k] = _serialize_nested(v)
-    return doc
-
-
-def _serialize_value(value):
-    if isinstance(value, ObjectId):
-        return str(value)
-    elif isinstance(value, dict):
-        return _serialize_nested(value)
-    elif isinstance(value, list):
-        return [_serialize_value(item) for item in value]
-    return value
-
-
-def _serialize_nested(d: dict) -> dict:
-    return {k: _serialize_value(v) for k, v in d.items()}
 
 
 def _embed_gear_images(docs: list[dict], db: Database) -> None:
@@ -91,7 +65,7 @@ def list_luminaries(
     docs = list(db.luminaries.find(query))
     _embed_gear_images(docs, db)
     _embed_gear_set_bonuses(docs, db)
-    return [_serialize(doc) for doc in docs]
+    return [serialize_doc(doc) for doc in docs]
 
 
 @router.get("/{slug}")
@@ -101,4 +75,4 @@ def get_luminary(slug: str, db: Database = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Luminary not found")
     _embed_gear_images([doc], db)
     _embed_gear_set_bonuses([doc], db)
-    return _serialize(doc)
+    return serialize_doc(doc)
