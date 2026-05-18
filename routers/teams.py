@@ -17,7 +17,7 @@ def list_teams(
     return team_service.get_user_teams(db, current_user.id)
 
 
-@router.post("/", response_model=TeamResponse, status_code=201)
+@router.post("", response_model=TeamResponse, status_code=201)
 def create_team(
     data: TeamCreate,
     current_user: UserResponse = Depends(get_current_user),
