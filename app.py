@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from config import settings
 from database import get_db
 from repositories import team_repo, user_repo
-from routers import admin, auth, luminaries, status_effects, subclasses, teams
+from routers import admin, auth, gear, luminaries, status_effects, subclasses, teams
 
 IMAGES_DIR = Path(settings.images_dir)
 
@@ -26,6 +26,7 @@ app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 app.include_router(auth.router)
 app.include_router(teams.router)
 app.include_router(luminaries.router)
+app.include_router(gear.router)
 app.include_router(subclasses.router)
 app.include_router(status_effects.router)
 app.include_router(admin.router)
