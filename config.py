@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     access_token_expire_days: int = 7
     # Comma-separated list of allowed CORS origins
     allowed_origins: str = "http://localhost:5173"
+    otel_enabled: bool = False
+    otel_exporter_otlp_endpoint: str = "http://192.168.88.204:4318"
 
     class Config:
         env_file = ".env"
