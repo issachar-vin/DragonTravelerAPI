@@ -16,6 +16,10 @@ dependencies = [
     "python-multipart>=0.0.28",
     "uvicorn[standard]>=0.47.0",
     "httpx>=0.28.0",
+    "opentelemetry-sdk>=1.42.1",
+    "opentelemetry-exporter-otlp-proto-http>=1.42.1",
+    "opentelemetry-instrumentation-fastapi>=0.63b1",
+    "opentelemetry-instrumentation-pymongo>=0.63b1",
 ]
 
 [dependency-groups]

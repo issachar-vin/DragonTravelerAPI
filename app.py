@@ -8,6 +8,7 @@ from config import settings
 from database import get_db
 from repositories import team_repo, user_repo
 from routers import admin, auth, gear, luminaries, status_effects, subclasses, teams
+from telemetry import setup_telemetry
 
 IMAGES_DIR = Path(settings.images_dir)
 
@@ -30,6 +31,8 @@ app.include_router(gear.router)
 app.include_router(subclasses.router)
 app.include_router(status_effects.router)
 app.include_router(admin.router)
+
+setup_telemetry(app)
 
 
 @app.on_event("startup")
