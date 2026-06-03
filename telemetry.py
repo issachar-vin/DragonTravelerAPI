@@ -57,7 +57,7 @@ def setup_telemetry(app: FastAPI) -> None:
     resource = Resource.create(
         {
             SERVICE_NAME: "DragonTravelerAPI",
-            SERVICE_NAMESPACE: "dragontraveler",
+            SERVICE_NAMESPACE: "dragon-traveler",
         }
     )
 
