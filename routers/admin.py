@@ -65,6 +65,38 @@ def images_status(
     }
 
 
+_ASSET_TYPES = (
+    "portrait",
+    "icon",
+    "class",
+    "faction",
+    "skill",
+    "talent",
+    "subclass",
+    "status_effect",
+)
+
+
+@router.post("/images/purge-cache")
+async def purge_cache(
+    db: Database = Depends(get_db),
+    _: UserResponse = Depends(require_admin),
+):
+    if not CF_ZONE_ID or not CF_API_TOKEN or not PUBLIC_URL:
+        return JSONResponse(
+            {"status": "skipped", "detail": "Cloudflare env vars not configured"},
+            status_code=200,
+        )
+
+    total = 0
+    for type_ in _ASSET_TYPES:
+        paths = [d["path"] for d in db.asset_images.find({"type": type_}, {"path": 1, "_id": 0})]
+        await _purge_cloudflare_cache(paths)
+        total += len(paths)
+
+    return {"status": "purged", "total": total}
+
+
 @router.post("/images/download")
 async def start_download(
     override: bool = Query(False, description="Re-download images that already exist"),

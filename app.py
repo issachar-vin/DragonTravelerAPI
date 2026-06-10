@@ -40,6 +40,8 @@ def startup():
     db = get_db()
     user_repo.ensure_indexes(db)
     team_repo.ensure_indexes(db)
+    db.asset_images.create_index("path", unique=True)
+    db.asset_images.create_index("type")
 
 
 @app.get("/")
